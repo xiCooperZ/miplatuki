@@ -108,7 +108,7 @@ function Sheet({ children, onClose }) {
   );
 }
 
-function Badge({ cat, cats }) {
+function _Badge({ cat, cats }) {
   const c = (cats || DEFAULT_CATS)[cat];
   if (!c) return null;
   return (
