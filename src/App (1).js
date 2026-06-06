@@ -108,7 +108,7 @@ function Sheet({ children, onClose }) {
   );
 }
 
-function _Badge({ cat, cats }) {
+function Badge({ cat, cats }) {
   const c = (cats || DEFAULT_CATS)[cat];
   if (!c) return null;
   return (
@@ -559,15 +559,15 @@ function TabDashboard({ activo, pendientes, cats, catData, total, restante, pct,
             {catData.map(({ k, total: t, pct: p }) => {
               const c = cats[k] || DEFAULT_CATS[k];
               return (
-                <div key={k} style={{ background:"#09090b",borderRadius:12,padding:"12px",display:"flex",alignItems:"center",gap:12 }}>
+                <div key={k} style={{ background:"#09090b",borderRadius:12,padding:"12px",display:"flex",flexDirection:"column",alignItems:"center",gap:8,textAlign:"center" }}>
                   <div style={{ position:"relative",width:52,height:52,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
                     <Ring pct={p} color={c.color} size={52} stroke={6}/>
                     <div style={{ position:"absolute",fontSize:16 }}>{c.icon}</div>
                   </div>
-                  <div style={{ minWidth:0 }}>
-                    <div style={{ color:"#f4f4f5",fontSize:12,fontWeight:700,marginBottom:2 }}>{c.label}</div>
-                    <div style={{ color:c.color,fontSize:14,fontWeight:800,fontFamily:"'Syne',sans-serif" }}>{fmt(t)}</div>
-                    <div style={{ color:"#52525b",fontSize:10,marginTop:1 }}>{p.toFixed(0)}% del sueldo</div>
+                  <div style={{ width:"100%" }}>
+                    <div style={{ color:"#f4f4f5",fontSize:11,fontWeight:700,marginBottom:3 }}>{c.label}</div>
+                    <div style={{ color:c.color,fontSize:13,fontWeight:800,fontFamily:"'Syne',sans-serif",wordBreak:"break-all" }}>{fmt(t)}</div>
+                    <div style={{ color:"#52525b",fontSize:10,marginTop:2 }}>{p.toFixed(0)}% del sueldo</div>
                   </div>
                 </div>
               );
