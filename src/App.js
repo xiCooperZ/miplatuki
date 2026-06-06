@@ -108,7 +108,7 @@ function Sheet({ children, onClose }) {
   );
 }
 
-function _Badge({ cat, cats }) {
+// eslint-disable-next-line no-unused-vars{ cat, cats }) {
   const c = (cats || DEFAULT_CATS)[cat];
   if (!c) return null;
   return (
