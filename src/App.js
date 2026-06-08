@@ -559,14 +559,14 @@ function TabDashboard({ activo, pendientes, cats, catData, total, restante, pct,
             {catData.map(({ k, total: t, pct: p }) => {
               const c = cats[k] || DEFAULT_CATS[k];
               return (
-                <div key={k} style={{ background:"#09090b",borderRadius:12,padding:"12px",display:"flex",alignItems:"center",gap:10 }}>
-                  <div style={{ position:"relative",width:48,height:48,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
-                    <Ring pct={p} color={c.color} size={48} stroke={5}/>
-                    <div style={{ position:"absolute",fontSize:15 }}>{c.icon}</div>
+                <div key={k} style={{ background:"#09090b",borderRadius:12,padding:"10px",display:"flex",alignItems:"center",gap:8 }}>
+                  <div style={{ position:"relative",width:36,height:36,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
+                    <Ring pct={p} color={c.color} size={36} stroke={4}/>
+                    <div style={{ position:"absolute",fontSize:12 }}>{c.icon}</div>
                   </div>
                   <div style={{ minWidth:0,flex:1 }}>
-                    <div style={{ color:"#f4f4f5",fontSize:11,fontWeight:700,marginBottom:2 }}>{c.label}</div>
-                    <div style={{ color:c.color,fontSize:12,fontWeight:800,fontFamily:"'Syne',sans-serif",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{fmt(t)}</div>
+                    <div style={{ color:"#a1a1aa",fontSize:10,fontWeight:700,marginBottom:1 }}>{c.label}</div>
+                    <div style={{ color:c.color,fontSize:13,fontWeight:800,fontFamily:"'Syne',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{fmt(t)}</div>
                     <div style={{ color:"#52525b",fontSize:9,marginTop:1 }}>{p.toFixed(0)}% del sueldo</div>
                   </div>
                 </div>
