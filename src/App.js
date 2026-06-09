@@ -2,13 +2,16 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 
 // ─── CATEGORÍAS BASE ──────────────────────────────────────────────────────────
 const DEFAULT_CATS = {
-  fijo:      { label:"Fijo",           icon:"🏠", color:"#4ade80", desc:"Arriendo, servicios básicos" },
-  hormiga:   { label:"Hormiga",        icon:"🐜", color:"#fb923c", desc:"Café, snacks, cositas chicas" },
-  antojo:    { label:"Antojo",         icon:"🛒", color:"#f472b6", desc:"Compras impulsivas, caprichos" },
-  variable:  { label:"Variable",       icon:"📦", color:"#60a5fa", desc:"Salud, transporte, ropa" },
-  regaloneo: { label:"Regaloneo",      icon:"🎁", color:"#a78bfa", desc:"Regalos a otros y a uno mismo" },
-  fantasma:  { label:"Gasto Fantasma", icon:"👻", color:"#94a3b8", desc:"Gastos que no recuerdas haber hecho" },
-  ahorro:    { label:"Ahorro",         icon:"💰", color:"#34d399", desc:"Plata guardada intencionalmente" },
+  fijo:        { label:"Fijo",           icon:"🏠", color:"#4ade80", desc:"Arriendo, servicios básicos" },
+  hormiga:     { label:"Hormiga",        icon:"🐜", color:"#fb923c", desc:"Café, snacks, cositas chicas" },
+  antojo:      { label:"Antojo",         icon:"🛒", color:"#f472b6", desc:"Compras impulsivas, caprichos" },
+  variable:    { label:"Variable",       icon:"📦", color:"#60a5fa", desc:"Salud, transporte, ropa" },
+  regaloneo:   { label:"Regaloneo",      icon:"🎁", color:"#a78bfa", desc:"Regalos a otros y a uno mismo" },
+  fantasma:    { label:"Gasto Fantasma", icon:"👻", color:"#94a3b8", desc:"Gastos que no recuerdas haber hecho" },
+  ahorro:      { label:"Ahorro",         icon:"💰", color:"#34d399", desc:"Plata guardada intencionalmente" },
+  deudas:      { label:"Deudas",         icon:"💳", color:"#f87171", desc:"Cuotas, préstamos, deudas" },
+  salud:       { label:"Salud",          icon:"🏥", color:"#38bdf8", desc:"Médico, remedios, atenciones" },
+  emergencias: { label:"Emergencias",    icon:"🚨", color:"#fbbf24", desc:"Imprevistos y urgencias" },
 };
 const CAT_KEYS = Object.keys(DEFAULT_CATS);
 const STORAGE_KEY = "sueldo_tracker_v7";
@@ -63,7 +66,7 @@ const DEFAULT = {
   activo:    { mes: currentMonth(), sueldo: 0, gastos: [] },
   historial: [],
   pendientes:[],
-  subcats:   { fijo:[], hormiga:[], antojo:[], variable:[], regaloneo:[], fantasma:[], ahorro:[] },
+  subcats:   { fijo:[], hormiga:[], antojo:[], variable:[], regaloneo:[], fantasma:[], ahorro:[], deudas:[], salud:[], emergencias:[] },
   cats:      DEFAULT_CATS,
 };
 
@@ -510,7 +513,7 @@ function TabDashboard({ activo, pendientes, cats, catData, total, restante, pct,
         <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16 }}>
           <div>
             <div style={{ color:"#52525b",fontSize:10,fontWeight:700,letterSpacing:"0.05em",marginBottom:4 }}>DISPONIBLE</div>
-            <div style={{ color: restante>=0?"#4ade80":"#f87171",fontSize:28,fontWeight:800,fontFamily:"'Syne',sans-serif",lineHeight:1 }}>{fmt(Math.abs(restante))}</div>
+            <div style={{ color: restante>=0?"#4ade80":"#f87171",fontSize:24,fontWeight:800,lineHeight:1 }}>{fmt(Math.abs(restante))}</div>
             {restante < 0 && <div style={{ color:"#f87171",fontSize:11,marginTop:3 }}>⚠️ Presupuesto excedido</div>}
           </div>
           <div style={{ position:"relative",width:84,height:84,display:"flex",alignItems:"center",justifyContent:"center" }}>
@@ -525,11 +528,11 @@ function TabDashboard({ activo, pendientes, cats, catData, total, restante, pct,
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:12 }}>
           <div>
             <div style={{ color:"#52525b",fontSize:10,fontWeight:700,letterSpacing:"0.05em",marginBottom:3 }}>SUELDO NETO</div>
-            <div style={{ color:"#4ade80",fontSize:16,fontWeight:800,fontFamily:"'Syne',sans-serif" }}>{activo.sueldo > 0 ? fmt(activo.sueldo) : "—"}</div>
+            <div style={{ color:"#4ade80",fontSize:15,fontWeight:800,whiteSpace:"nowrap" }}>{activo.sueldo > 0 ? fmt(activo.sueldo) : "—"}</div>
           </div>
           <div>
             <div style={{ color:"#52525b",fontSize:10,fontWeight:700,letterSpacing:"0.05em",marginBottom:3 }}>TOTAL GASTOS</div>
-            <div style={{ color:"#fb923c",fontSize:16,fontWeight:800,fontFamily:"'Syne',sans-serif" }}>{total > 0 ? fmt(total) : "—"}</div>
+            <div style={{ color:"#fb923c",fontSize:15,fontWeight:800,whiteSpace:"nowrap" }}>{total > 0 ? fmt(total) : "—"}</div>
           </div>
         </div>
       </div>
