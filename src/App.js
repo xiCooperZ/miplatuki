@@ -128,7 +128,7 @@ function EditCatSheet({ catKey, cat, onSave, onClose }) {
   const [color, setColor] = useState(cat.color);
   return (
     <Sheet onClose={onClose}>
-      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"'Syne',sans-serif",marginBottom:4 }}>✏️ Personalizar categoría</h2>
+      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"system-ui,sans-serif",marginBottom:4 }}>✏️ Personalizar categoría</h2>
       <p style={{ color:"#71717a",fontSize:13,marginBottom:20 }}>Emoji y color para <strong style={{ color }}>{cat.label}</strong></p>
       <div style={{ display:"flex",alignItems:"center",gap:12,background:"#09090b",borderRadius:12,padding:"14px 16px",marginBottom:20 }}>
         <div style={{ width:44,height:44,borderRadius:12,background:color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,border:`2px solid ${color}55` }}>{icon}</div>
@@ -151,7 +151,7 @@ function EditCatSheet({ catKey, cat, onSave, onClose }) {
       </div>
       <div style={{ display:"flex",gap:10 }}>
         <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer" }}>Cancelar</button>
-        <button onClick={() => onSave(catKey, { icon, color })} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:`linear-gradient(135deg,${color},${color}bb)`,color:"#09090b",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"'Syne',sans-serif" }}>Guardar</button>
+        <button onClick={() => onSave(catKey, { icon, color })} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:`linear-gradient(135deg,${color},${color}bb)`,color:"#09090b",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"system-ui,sans-serif" }}>Guardar</button>
       </div>
     </Sheet>
   );
@@ -165,19 +165,19 @@ function SueldoSheet({ current, onSave, onClose }) {
   const ok = val > 0 && !tooLarge;
   return (
     <Sheet onClose={onClose}>
-      <h2 style={{ color:"#f4f4f5",fontSize:20,fontFamily:"'Syne',sans-serif",marginBottom:4 }}>💼 Tu sueldo mensual</h2>
+      <h2 style={{ color:"#f4f4f5",fontSize:20,fontFamily:"system-ui,sans-serif",marginBottom:4 }}>💼 Tu sueldo mensual</h2>
       <p style={{ color:"#71717a",fontSize:13,marginBottom:18 }}>Monto neto que recibes en mano</p>
       <div style={{ position:"relative",marginBottom:6 }}>
         <span style={{ position:"absolute",left:13,top:"50%",transform:"translateY(-50%)",color:"#a1a1aa",fontWeight:700 }}>$</span>
         <input autoFocus type="number" value={v} onChange={e => setV(e.target.value)}
           onKeyDown={e => e.key === "Enter" && ok && onSave(val)} placeholder="600000"
-          style={{ width:"100%",boxSizing:"border-box",background:"#09090b",border:`1px solid ${tooLarge?"#ef4444":"#3f3f46"}`,borderRadius:12,padding:"13px 13px 13px 28px",color:"#f4f4f5",fontSize:20,outline:"none",fontFamily:"'Syne',sans-serif" }}/>
+          style={{ width:"100%",boxSizing:"border-box",background:"#09090b",border:`1px solid ${tooLarge?"#ef4444":"#3f3f46"}`,borderRadius:12,padding:"13px 13px 13px 28px",color:"#f4f4f5",fontSize:20,outline:"none",fontFamily:"system-ui,sans-serif" }}/>
       </div>
       {tooLarge && <p style={{ color:"#f87171",fontSize:12,marginBottom:10 }}>⚠️ Revisa el monto ingresado</p>}
       {!tooLarge && <div style={{ marginBottom:14 }}/>}
       <div style={{ display:"flex",gap:10 }}>
         <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer" }}>Cancelar</button>
-        <button onClick={() => ok && onSave(val)} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:"linear-gradient(135deg,#4ade80,#22c55e)",color:"#052e16",fontWeight:800,cursor:ok?"pointer":"not-allowed",opacity:ok?1:0.5,fontSize:15,fontFamily:"'Syne',sans-serif" }}>Guardar</button>
+        <button onClick={() => ok && onSave(val)} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:"linear-gradient(135deg,#4ade80,#22c55e)",color:"#052e16",fontWeight:800,cursor:ok?"pointer":"not-allowed",opacity:ok?1:0.5,fontSize:15,fontFamily:"system-ui,sans-serif" }}>Guardar</button>
       </div>
     </Sheet>
   );
@@ -232,7 +232,7 @@ function GastoSheet({ onSave, onClose, onAddSub, onDeleteSub, gastoEditar, subca
 
   return (
     <Sheet onClose={onClose}>
-      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"'Syne',sans-serif",marginBottom:4 }}>
+      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"system-ui,sans-serif",marginBottom:4 }}>
         {gastoEditar ? "✏️ Editar gasto" : "💸 Registrar gasto"}
       </h2>
       <p style={{ color:"#71717a",fontSize:13,marginBottom:20 }}>Asigna descripción, monto y clasificación</p>
@@ -300,7 +300,7 @@ function GastoSheet({ onSave, onClose, onAddSub, onDeleteSub, gastoEditar, subca
 
       <div style={{ display:"flex",gap:10 }}>
         <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer" }}>Cancelar</button>
-        <button onClick={save} disabled={!ok} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:ok?`linear-gradient(135deg,${c.color},${c.color}bb)`:"#27272a",color:ok?"#09090b":"#71717a",fontWeight:800,cursor:ok?"pointer":"not-allowed",fontSize:14,fontFamily:"'Syne',sans-serif",transition:"all 0.2s" }}>
+        <button onClick={save} disabled={!ok} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:ok?`linear-gradient(135deg,${c.color},${c.color}bb)`:"#27272a",color:ok?"#09090b":"#71717a",fontWeight:800,cursor:ok?"pointer":"not-allowed",fontSize:14,fontFamily:"system-ui,sans-serif",transition:"all 0.2s" }}>
           {gastoEditar ? "Guardar cambios" : "Confirmar gasto"}
         </button>
       </div>
@@ -335,7 +335,7 @@ function CerrarSheet({ activo, onConfirm, onClose }) {
 
   return (
     <Sheet onClose={onClose}>
-      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"'Syne',sans-serif",marginBottom:4 }}>📦 Cerrar {monthLabel(activo.mes)}</h2>
+      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"system-ui,sans-serif",marginBottom:4 }}>📦 Cerrar {monthLabel(activo.mes)}</h2>
       <p style={{ color:"#71717a",fontSize:13,marginBottom:20,lineHeight:1.5 }}>
         El mes quedará guardado en el historial y podrás ver cómo le fue.
       </p>
@@ -367,7 +367,7 @@ function CerrarSheet({ activo, onConfirm, onClose }) {
             <span style={{ color:"#a1a1aa",fontWeight:600,fontSize:14 }}>
               {sobrante >= 0 ? "💸 Sin usar" : "⚠️ Excedido"}
             </span>
-            <span style={{ color:sobrante>=0?"#4ade80":"#f87171",fontWeight:800,fontSize:20,fontFamily:"'Syne',sans-serif" }}>
+            <span style={{ color:sobrante>=0?"#4ade80":"#f87171",fontWeight:800,fontSize:20,fontFamily:"system-ui,sans-serif" }}>
               {fmt(Math.abs(sobrante))}
             </span>
           </div>
@@ -389,7 +389,7 @@ function CerrarSheet({ activo, onConfirm, onClose }) {
 
       <div style={{ display:"flex",gap:10 }}>
         <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer" }}>Cancelar</button>
-        <button onClick={onConfirm} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:"linear-gradient(135deg,#818cf8,#6366f1)",color:"#fff",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"'Syne',sans-serif" }}>
+        <button onClick={onConfirm} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:"linear-gradient(135deg,#818cf8,#6366f1)",color:"#fff",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"system-ui,sans-serif" }}>
           Cerrar mes ✓
         </button>
       </div>
@@ -403,11 +403,11 @@ function ClasificarSheet({ pendiente, onSave, onClose, cats }) {
   const c = cats[cat] || DEFAULT_CATS[cat];
   return (
     <Sheet onClose={onClose}>
-      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"'Syne',sans-serif",marginBottom:4 }}>🗂️ Clasificar gasto</h2>
+      <h2 style={{ color:"#f4f4f5",fontSize:19,fontFamily:"system-ui,sans-serif",marginBottom:4 }}>🗂️ Clasificar gasto</h2>
       <p style={{ color:"#71717a",fontSize:13,marginBottom:18 }}>¿A qué categoría pertenece este gasto?</p>
       <div style={{ background:"#09090b",borderRadius:12,padding:"14px 16px",marginBottom:18 }}>
         <div style={{ color:"#f4f4f5",fontSize:15,fontWeight:600,marginBottom:4 }}>{pendiente.nombre}</div>
-        <div style={{ color:"#4ade80",fontSize:20,fontWeight:800,fontFamily:"'Syne',sans-serif" }}>{fmt(pendiente.monto)}</div>
+        <div style={{ color:"#4ade80",fontSize:20,fontWeight:800,fontFamily:"system-ui,sans-serif" }}>{fmt(pendiente.monto)}</div>
       </div>
       <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,marginBottom:22 }}>
         {CAT_KEYS.map(k => {
@@ -423,7 +423,7 @@ function ClasificarSheet({ pendiente, onSave, onClose, cats }) {
       </div>
       <div style={{ display:"flex",gap:10 }}>
         <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer" }}>Cancelar</button>
-        <button onClick={() => onSave({ ...pendiente, categoria: cat })} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:`linear-gradient(135deg,${c.color},${c.color}bb)`,color:"#09090b",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"'Syne',sans-serif" }}>
+        <button onClick={() => onSave({ ...pendiente, categoria: cat })} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:`linear-gradient(135deg,${c.color},${c.color}bb)`,color:"#09090b",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"system-ui,sans-serif" }}>
           Registrar como {c.label}
         </button>
       </div>
@@ -443,11 +443,11 @@ function ResumenMes({ mes, cats }) {
     <div style={{ background:"#18181b",border:"1px solid #27272a",borderRadius:13,marginBottom:10,overflow:"hidden" }}>
       <button onClick={() => setOpen(o => !o)} style={{ width:"100%",padding:"15px 16px",background:"transparent",border:"none",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
         <div style={{ textAlign:"left" }}>
-          <div style={{ fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:15,color:"#f4f4f5" }}>{monthLabel(mes.mes)}</div>
+          <div style={{ fontFamily:"system-ui,sans-serif",fontWeight:800,fontSize:15,color:"#f4f4f5" }}>{monthLabel(mes.mes)}</div>
           <div style={{ color:"#52525b",fontSize:11,marginTop:1 }}>{mes.gastos.length} gastos · {fmt(total)} gastado</div>
         </div>
         <div style={{ textAlign:"right" }}>
-          <div style={{ color:ahorro>=0?"#4ade80":"#f87171",fontWeight:800,fontSize:15,fontFamily:"'Syne',sans-serif" }}>{ahorro >= 0 ? "💰" : ""}{fmt(Math.abs(ahorro))}</div>
+          <div style={{ color:ahorro>=0?"#4ade80":"#f87171",fontWeight:800,fontSize:15,fontFamily:"system-ui,sans-serif" }}>{ahorro >= 0 ? "💰" : ""}{fmt(Math.abs(ahorro))}</div>
           <div style={{ color:"#52525b",fontSize:10 }}>{ahorro >= 0 ? "ahorrado" : "excedido"}</div>
         </div>
       </button>
@@ -519,7 +519,7 @@ function TabDashboard({ activo, pendientes, cats, catData, total, restante, pct,
           <div style={{ position:"relative",width:84,height:84,display:"flex",alignItems:"center",justifyContent:"center" }}>
             <Ring pct={pct} color={pctColor} size={84} stroke={9}/>
             <div style={{ position:"absolute",textAlign:"center" }}>
-              <div style={{ color:"#fff",fontWeight:800,fontSize:15,fontFamily:"'Syne',sans-serif" }}>{Math.round(pct)}%</div>
+              <div style={{ color:"#fff",fontWeight:800,fontSize:15,fontFamily:"system-ui,sans-serif" }}>{Math.round(pct)}%</div>
               <div style={{ color:"#a1a1aa",fontSize:8,fontWeight:700 }}>GASTADO</div>
             </div>
           </div>
@@ -569,7 +569,7 @@ function TabDashboard({ activo, pendientes, cats, catData, total, restante, pct,
                   </div>
                   <div style={{ minWidth:0,flex:1 }}>
                     <div style={{ color:"#a1a1aa",fontSize:10,fontWeight:700,marginBottom:1 }}>{c.label}</div>
-                    <div style={{ color:c.color,fontSize:13,fontWeight:800,fontFamily:"'Syne',sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{fmt(t)}</div>
+                    <div style={{ color:c.color,fontSize:13,fontWeight:800,fontFamily:"system-ui,sans-serif",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{fmt(t)}</div>
                     <div style={{ color:"#52525b",fontSize:9,marginTop:1 }}>{p.toFixed(0)}% del sueldo</div>
                   </div>
                 </div>
@@ -605,7 +605,7 @@ function TabGastos({ gastosOrdenados, total, cats, onDelete, onEdit }) {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:13 }}>
-        <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:16 }}>
+        <h2 style={{ fontFamily:"system-ui,sans-serif",fontSize:16 }}>
           Gastos <span style={{ color:"#52525b",fontWeight:400,fontSize:12 }}>({gastosOrdenados.reduce((a, g) => a + g.items.length, 0)})</span>
         </h2>
         {gastosOrdenados.length > 0 && <span style={{ color:"#52525b",fontSize:12 }}>Total: <strong style={{ color:"#fb923c" }}>{fmt(total)}</strong></span>}
@@ -628,7 +628,7 @@ function TabGastos({ gastosOrdenados, total, cats, onDelete, onEdit }) {
                     <span style={{ color:c.color,fontWeight:700,fontSize:13 }}>{c.label}</span>
                     <span style={{ color:"#52525b",fontSize:11 }}>({items.length})</span>
                   </div>
-                  <span style={{ color:c.color,fontWeight:800,fontSize:13,fontFamily:"'Syne',sans-serif" }}>{fmt(subtotal)}</span>
+                  <span style={{ color:c.color,fontWeight:800,fontSize:13,fontFamily:"system-ui,sans-serif" }}>{fmt(subtotal)}</span>
                 </div>
                 <div style={{ display:"flex",flexDirection:"column",gap:7 }}>
                   {items.map(g => (
@@ -641,7 +641,7 @@ function TabGastos({ gastosOrdenados, total, cats, onDelete, onEdit }) {
                         </div>
                       </div>
                       <div style={{ display:"flex",alignItems:"center",gap:6,flexShrink:0 }}>
-                        <div style={{ color:c.color,fontWeight:800,fontSize:13,fontFamily:"'Syne',sans-serif" }}>{fmt(g.monto)}</div>
+                        <div style={{ color:c.color,fontWeight:800,fontSize:13,fontFamily:"system-ui,sans-serif" }}>{fmt(g.monto)}</div>
                         {/* MEJORA: botón editar */}
                         <button onClick={() => onEdit(g)} style={{ background:"#27272a",border:"none",color:"#a1a1aa",cursor:"pointer",fontSize:12,padding:"4px 7px",borderRadius:7,lineHeight:1 }}>✏️</button>
                         <button onClick={() => onDelete(g.id)} style={{ background:"#27272a",border:"none",color:"#71717a",cursor:"pointer",fontSize:12,padding:"4px 7px",borderRadius:7,lineHeight:1 }}>✕</button>
@@ -663,7 +663,7 @@ function TabCategorias({ cats, onEdit }) {
   return (
     <div>
       <div style={{ marginBottom:16 }}>
-        <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:16,marginBottom:4 }}>🎨 Personalizar categorías</h2>
+        <h2 style={{ fontFamily:"system-ui,sans-serif",fontSize:16,marginBottom:4 }}>🎨 Personalizar categorías</h2>
         <p style={{ color:"#71717a",fontSize:13 }}>Toca cualquier categoría para cambiar su emoji y color.</p>
       </div>
       <div style={{ display:"flex",flexDirection:"column",gap:9 }}>
@@ -691,14 +691,14 @@ function TabHistorial({ historial, totalAhorro, cats }) {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:13 }}>
-        <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:16 }}>
+        <h2 style={{ fontFamily:"system-ui,sans-serif",fontSize:16 }}>
           Historial <span style={{ color:"#52525b",fontWeight:400,fontSize:12 }}>({historial.length} meses)</span>
         </h2>
       </div>
       {historial.length > 0 && (
         <div style={{ background:"#18181b",border:`1px solid ${totalAhorro>=0?"#4ade8044":"#f8717144"}`,borderRadius:13,padding:"15px",marginBottom:13 }}>
           <div style={{ color:"#a1a1aa",fontSize:10,fontWeight:700,letterSpacing:"0.06em",marginBottom:5 }}>{totalAhorro >= 0 ? "💰 AHORRO TOTAL ACUMULADO" : "⚠️ DÉFICIT TOTAL ACUMULADO"}</div>
-          <div style={{ color:totalAhorro>=0?"#4ade80":"#f87171",fontSize:24,fontWeight:800,fontFamily:"'Syne',sans-serif" }}>{fmt(Math.abs(totalAhorro))}</div>
+          <div style={{ color:totalAhorro>=0?"#4ade80":"#f87171",fontSize:24,fontWeight:800,fontFamily:"system-ui,sans-serif" }}>{fmt(Math.abs(totalAhorro))}</div>
           <div style={{ color:"#52525b",fontSize:10,marginTop:3 }}>en {historial.length} {historial.length === 1 ? "mes" : "meses"} cerrados</div>
         </div>
       )}
@@ -720,13 +720,13 @@ function TabEmail({ emailText, setEmailText, emailLoading, emailError, setEmailE
   return (
     <div style={{ display:"flex",flexDirection:"column",gap:13 }}>
       <div>
-        <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:16,marginBottom:4 }}>📧 Pegar correo del banco</h2>
+        <h2 style={{ fontFamily:"system-ui,sans-serif",fontSize:16,marginBottom:4 }}>📧 Pegar correo del banco</h2>
         <p style={{ color:"#71717a",fontSize:13,lineHeight:1.5 }}>La IA extrae los gastos y los deja como <strong style={{ color:"#fb923c" }}>pendientes</strong>. Tú los clasificas cuando quieras.</p>
       </div>
       <textarea value={emailText} onChange={e => { setEmailText(e.target.value); setEmailError(""); }}
         placeholder={"Pega aquí el correo del banco...\n\nEjemplo:\nHola Sebastián, se realizó un cargo de $1.890 en OK Market con tu tarjeta terminada en 1234.\nFecha: 01/06/2026"}
         rows={8} style={{ width:"100%",background:"#18181b",border:"1px solid #3f3f46",borderRadius:12,padding:"13px",color:"#f4f4f5",fontSize:13,resize:"vertical",outline:"none",lineHeight:1.6 }}/>
-      <button onClick={onParse} disabled={emailLoading || !emailText.trim()} style={{ width:"100%",padding:13,borderRadius:12,border:"none",background:emailLoading||!emailText.trim()?"#27272a":"linear-gradient(135deg,#818cf8,#6366f1)",color:emailLoading||!emailText.trim()?"#52525b":"#fff",fontWeight:800,cursor:emailLoading||!emailText.trim()?"not-allowed":"pointer",fontSize:14,fontFamily:"'Syne',sans-serif",transition:"all 0.2s" }}>
+      <button onClick={onParse} disabled={emailLoading || !emailText.trim()} style={{ width:"100%",padding:13,borderRadius:12,border:"none",background:emailLoading||!emailText.trim()?"#27272a":"linear-gradient(135deg,#818cf8,#6366f1)",color:emailLoading||!emailText.trim()?"#52525b":"#fff",fontWeight:800,cursor:emailLoading||!emailText.trim()?"not-allowed":"pointer",fontSize:14,fontFamily:"system-ui,sans-serif",transition:"all 0.2s" }}>
         {emailLoading ? "⏳ Extrayendo gastos..." : "🔍 Detectar gastos con IA"}
       </button>
       {emailError && <div style={{ background:"#18181b",border:"1px solid #ef444455",borderRadius:12,padding:"13px 15px",color:"#f87171",fontSize:13 }}>⚠️ {emailError}</div>}
@@ -975,7 +975,7 @@ export default function App() {
       {editCat     && <EditCatSheet catKey={editCat.key} cat={editCat.cat} onSave={handleSaveCat} onClose={() => setEditCat(null)}/>}
       {deleteId    && (
         <Sheet onClose={() => setDeleteId(null)}>
-          <h3 style={{ color:"#f4f4f5",fontFamily:"'Syne',sans-serif",marginBottom:8,fontSize:18 }}>¿Eliminar gasto?</h3>
+          <h3 style={{ color:"#f4f4f5",fontFamily:"system-ui,sans-serif",marginBottom:8,fontSize:18 }}>¿Eliminar gasto?</h3>
           <p style={{ color:"#71717a",fontSize:14,marginBottom:22 }}>Esta acción no se puede deshacer.</p>
           <div style={{ display:"flex",gap:10 }}>
             <button onClick={() => setDeleteId(null)} style={{ flex:1,padding:12,borderRadius:12,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer" }}>Cancelar</button>
@@ -987,7 +987,7 @@ export default function App() {
       {/* HEADER — MEJORA: flechas de navegación de mes (del documento) */}
       <header style={{ padding:"13px 17px",borderBottom:"1px solid #1f1f23",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,background:"#09090b",zIndex:100 }}>
         <div>
-          <h1 style={{ fontSize:15,fontFamily:"'Syne',sans-serif",fontWeight:800,letterSpacing:"-0.02em" }}>💸 ¿Dónde va mi sueldo?</h1>
+          <h1 style={{ fontSize:15,fontFamily:"system-ui,sans-serif",fontWeight:800,letterSpacing:"-0.02em" }}>💸 ¿Dónde va mi sueldo?</h1>
           {/* Navegación de mes */}
           <div style={{ display:"flex",alignItems:"center",gap:6,marginTop:2 }}>
             <button onClick={() => cambiarMes(-1)} style={{ background:"transparent",border:"none",color:"#52525b",cursor:"pointer",fontSize:12,padding:"0 2px",lineHeight:1 }}>◀</button>
@@ -1002,7 +1002,7 @@ export default function App() {
           <button onClick={() => setShowSueldo(true)} style={{ padding:"6px 10px",borderRadius:10,border:"1px solid #3f3f46",background:"transparent",color:"#a1a1aa",cursor:"pointer",fontSize:12,whiteSpace:"nowrap" }}>
             ✏️ {activo.sueldo > 0 ? fmt(activo.sueldo) : "Sueldo"}
           </button>
-          <button onClick={() => setGastoEditar({})} style={{ padding:"7px 13px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#4ade80,#22c55e)",color:"#052e16",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"'Syne',sans-serif" }}>+</button>
+          <button onClick={() => setGastoEditar({})} style={{ padding:"7px 13px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#4ade80,#22c55e)",color:"#052e16",fontWeight:800,cursor:"pointer",fontSize:14,fontFamily:"system-ui,sans-serif" }}>+</button>
         </div>
       </header>
 
