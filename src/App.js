@@ -9,12 +9,73 @@ const DEFAULT_CATS = {
   regaloneo: { label:"Regaloneo",      icon:"🎁", color:"#a78bfa", desc:"Regalos y caprichos para ti y los que quieres" },
   fantasma:  { label:"Gasto Fantasma", icon:"👻", color:"#94a3b8", desc:"Suscripciones que te chupan la plata sin que te des cuenta — Spotify, Netflix, etc." },
   ahorro:    { label:"Ahorro",         icon:"💰", color:"#34d399", desc:"Plata guardada intencionalmente para el futuro" },
-  deudas:    { label:"Deudas",         icon:"💳", color:"#f87171", desc:"Cuotas, préstamos y compromisos financieros" },
+  deudas:    { label:"Deudas",         icon:"💰", color:"#f87171", desc:"Cuotas, préstamos y compromisos financieros" },
   salud:     { label:"Salud",          icon:"🏥", color:"#38bdf8", desc:"Médico, remedios, atenciones — lo que no se puede dejar" },
   emergencias:{ label:"Emergencias",  icon:"🚨", color:"#fbbf24", desc:"Imprevistos que aparecen cuando menos los esperas" },
 };
 
 const STORAGE_KEY = "sueldo_tracker_v8";
+const THEME_KEY   = "miplatuki_theme";
+
+// ─── TEMAS ────────────────────────────────────────────────────────────────────
+const THEMES = {
+  default: {
+    name: "Default",       emoji: "🌑",
+    bg:   "#09090b",       surface: "#18181b",  surface2: "#09090b",
+    border: "#27272a",     border2: "#3f3f46",
+    text:   "#f4f4f5",     text2: "#a1a1aa",    text3: "#52525b",
+    accent: "#4ade80",     accentGrad: "linear-gradient(135deg,#4ade80,#22c55e)",
+  },
+  amoled: {
+    name: "AMOLED",        emoji: "⚫",
+    bg:   "#000000",       surface: "#0a0a0a",  surface2: "#000000",
+    border: "#1a1a1a",     border2: "#2a2a2a",
+    text:   "#ffffff",     text2: "#888888",    text3: "#444444",
+    accent: "#ffffff",     accentGrad: "linear-gradient(135deg,#ffffff,#cccccc)",
+  },
+  matrix: {
+    name: "Matrix",        emoji: "💚",
+    bg:   "#000000",       surface: "#001a00",  surface2: "#000d00",
+    border: "#003300",     border2: "#005500",
+    text:   "#00ff41",     text2: "#00cc33",    text3: "#006600",
+    accent: "#00ff41",     accentGrad: "linear-gradient(135deg,#00ff41,#00cc33)",
+  },
+  neon: {
+    name: "Neon",          emoji: "💙",
+    bg:   "#050510",       surface: "#0a0a1f",  surface2: "#05050f",
+    border: "#1a1a4a",     border2: "#2a2a6a",
+    text:   "#e0e0ff",     text2: "#8888cc",    text3: "#444488",
+    accent: "#4488ff",     accentGrad: "linear-gradient(135deg,#4488ff,#0044cc)",
+  },
+  cyberpunk: {
+    name: "Cyberpunk",     emoji: "🟣",
+    bg:   "#0d0015",       surface: "#1a0028",  surface2: "#0d0015",
+    border: "#3d0066",     border2: "#6600aa",
+    text:   "#ff00ff",     text2: "#cc00cc",    text3: "#660066",
+    accent: "#ff00ff",     accentGrad: "linear-gradient(135deg,#ff00ff,#cc00cc)",
+  },
+  minimal: {
+    name: "Minimalista",   emoji: "⚪",
+    bg:   "#111111",       surface: "#1c1c1c",  surface2: "#111111",
+    border: "#2c2c2c",     border2: "#3c3c3c",
+    text:   "#eeeeee",     text2: "#999999",    text3: "#555555",
+    accent: "#eeeeee",     accentGrad: "linear-gradient(135deg,#eeeeee,#cccccc)",
+  },
+  sunset: {
+    name: "Sunset",        emoji: "🌅",
+    bg:   "#0f0508",       surface: "#1f0d10",  surface2: "#0f0508",
+    border: "#3d1520",     border2: "#6d2535",
+    text:   "#ffd4a0",     text2: "#cc8855",    text3: "#664422",
+    accent: "#ff6633",     accentGrad: "linear-gradient(135deg,#ff6633,#ff3366)",
+  },
+  ocean: {
+    name: "Ocean",         emoji: "🌊",
+    bg:   "#020d18",       surface: "#051e33",  surface2: "#020d18",
+    border: "#0a3a5c",     border2: "#0d5c8a",
+    text:   "#b0e0ff",     text2: "#5599cc",    text3: "#224466",
+    accent: "#00aaff",     accentGrad: "linear-gradient(135deg,#00aaff,#0066cc)",
+  },
+};
 
 const COLOR_PALETTE = [
   "#4ade80","#22c55e","#86efac","#16a34a","#052e16",
@@ -848,11 +909,69 @@ function TabEmail({ emailText, setEmailText, emailLoading, emailError, setEmailE
   );
 }
 
+// ─── TAB TEMAS ────────────────────────────────────────────────────────────────
+function TabTemas({ temaActual, onChangeTema, th }) {
+  return (
+    <div>
+      <div style={{ marginBottom:16 }}>
+        <h2 style={{ fontSize:16,fontWeight:800,color:th.text,marginBottom:4 }}>🎨 Temas</h2>
+        <p style={{ color:th.text3,fontSize:13 }}>Elige el look de tu app</p>
+      </div>
+      <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+        {Object.entries(THEMES).map(([key, tema]) => {
+          const activo = temaActual === key;
+          return (
+            <button key={key} onClick={()=>onChangeTema(key)} style={{
+              display:"flex", alignItems:"center", gap:14,
+              background: activo ? tema.accent+"22" : th.surface,
+              border: `2px solid ${activo ? tema.accent : th.border}`,
+              borderRadius:14, padding:"14px 16px", cursor:"pointer",
+              textAlign:"left", width:"100%", transition:"all 0.2s",
+            }}>
+              {/* Preview mini del tema */}
+              <div style={{ width:48,height:48,borderRadius:12,background:tema.bg,border:`2px solid ${tema.border2}`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,overflow:"hidden",position:"relative" }}>
+                <div style={{ position:"absolute",inset:0,background:tema.surface,opacity:0.8 }}/>
+                <span style={{ fontSize:22,position:"relative",zIndex:1 }}>{tema.emoji}</span>
+              </div>
+              <div style={{ flex:1 }}>
+                <div style={{ color:activo?tema.accent:th.text,fontWeight:700,fontSize:14,marginBottom:3 }}>{tema.name}</div>
+                {/* Mini paleta de colores */}
+                <div style={{ display:"flex",gap:4 }}>
+                  {[tema.bg,tema.surface,tema.accent,tema.border2].map((c,i)=>(
+                    <div key={i} style={{ width:14,height:14,borderRadius:"50%",background:c,border:"1px solid rgba(255,255,255,0.1)" }}/>
+                  ))}
+                </div>
+              </div>
+              {activo && (
+                <div style={{ width:24,height:24,borderRadius:"50%",background:tema.accentGrad,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12 }}>✓</div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ marginTop:20,padding:"12px 14px",background:th.surface,borderRadius:12,border:`1px solid ${th.border}` }}>
+        <p style={{ color:th.text3,fontSize:12,lineHeight:1.6 }}>
+          💡 El tema se guarda automáticamente y se aplica cada vez que abres la app.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [st, setSt]         = useState(DEFAULT);
   const [loaded, setLoaded] = useState(false);
   const [tab, setTab]       = useState("dashboard");
+  const [tema, setTema]     = useState(() => {
+    try { return localStorage.getItem(THEME_KEY) || "default"; } catch { return "default"; }
+  });
+  const th = THEMES[tema] || THEMES.default;
+
+  const handleChangeTema = (key) => {
+    setTema(key);
+    try { localStorage.setItem(THEME_KEY, key); } catch {}
+  };
 
   const [showSueldo,  setShowSueldo]  = useState(false);
   const [showCerrar,  setShowCerrar]  = useState(false);
@@ -986,11 +1105,11 @@ export default function App() {
   if(!loaded)return(<div style={{ minHeight:"100vh",background:"#09090b",display:"flex",alignItems:"center",justifyContent:"center",color:"#4ade80",fontSize:32 }}>⏳</div>);
 
   return (
-    <div style={{ minHeight:"100vh",background:"#09090b",color:"#f4f4f5",fontFamily:"system-ui,-apple-system,sans-serif",maxWidth:"100vw",overflowX:"hidden" }}>
+    <div style={{ minHeight:"100vh",background:th.bg,color:th.text,fontFamily:"system-ui,-apple-system,sans-serif",maxWidth:"100vw",overflowX:"hidden" }}>
       <style>{`
         *{box-sizing:border-box;margin:0;padding:0;}
         input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
-        ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:99px;}
+        ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-thumb{background:${th.border2};border-radius:99px;}
         textarea,button,input{font-family:system-ui,-apple-system,sans-serif;}
       `}</style>
 
@@ -1027,9 +1146,9 @@ export default function App() {
         </div>
       </header>
 
-      <div style={{ display:"flex",borderBottom:"1px solid #1f1f23",padding:"0 16px",overflowX:"auto" }}>
-        {[["dashboard","📊 Resumen"],["gastos","📋 Gastos"],["categorias","🎨 Categorías"],["historial","🗂️ Historial"],["email","📧 Correo"]].map(([k,lbl])=>(
-          <button key={k} onClick={()=>setTab(k)} style={{ padding:"10px 11px",background:"transparent",border:"none",color:tab===k?"#4ade80":"#71717a",cursor:"pointer",fontSize:12,borderBottom:`2px solid ${tab===k?"#4ade80":"transparent"}`,transition:"all 0.15s",whiteSpace:"nowrap" }}>{lbl}</button>
+      <div style={{ display:"flex",borderBottom:`1px solid ${th.border}`,padding:"0 16px",overflowX:"auto" }}>
+        {[["dashboard","📊 Resumen"],["gastos","📋 Gastos"],["categorias","🎨 Categorías"],["historial","🗂️ Historial"],["temas","🌈 Temas"],["email","📧 Correo"]].map(([k,lbl])=>(
+          <button key={k} onClick={()=>setTab(k)} style={{ padding:"10px 11px",background:"transparent",border:"none",color:tab===k?th.accent:th.text3,cursor:"pointer",fontSize:12,borderBottom:`2px solid ${tab===k?th.accent:"transparent"}`,transition:"all 0.15s",whiteSpace:"nowrap" }}>{lbl}</button>
         ))}
       </div>
 
@@ -1038,6 +1157,7 @@ export default function App() {
         {tab==="gastos"&&<TabGastos gastosOrdenados={gastosOrdenados} total={total} cats={cats} catKeys={catKeys} onDelete={setDeleteId} onEdit={g=>setGastoEditar(g)}/>}
         {tab==="categorias"&&<TabCategorias cats={cats} catKeys={catKeys} defaultCatKeys={DEFAULT_CAT_KEYS} onEdit={setEditCat} onNew={()=>setShowNewCat(true)}/>}
         {tab==="historial"&&<TabHistorial historial={historial} totalAhorro={totalAhorro} cats={cats} catKeys={catKeys}/>}
+        {tab==="temas"&&<TabTemas temaActual={tema} onChangeTema={handleChangeTema} th={th}/>}
         {tab==="email"&&<TabEmail emailText={emailText} setEmailText={setEmailText} emailLoading={emailLoading} emailError={emailError} setEmailError={setEmailError} onParse={parseEmail} pendientes={pendientes}/>}
       </main>
     </div>
