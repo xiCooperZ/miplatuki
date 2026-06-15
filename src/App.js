@@ -9,9 +9,9 @@ const DEFAULT_CATS = {
   regaloneo: { label:"Regaloneo",      icon:"🎁", color:"#a78bfa", desc:"Regalos y caprichos para ti y los que quieres" },
   fantasma:  { label:"Gasto Fantasma", icon:"👻", color:"#94a3b8", desc:"Suscripciones que te chupan la plata sin que te des cuenta — Spotify, Netflix, etc." },
   ahorro:    { label:"Ahorro",         icon:"💰", color:"#34d399", desc:"Plata guardada intencionalmente para el futuro" },
-  deudas:    { label:"Deudas",         icon:"💰", color:"#f87171", desc:"Cuotas, préstamos y compromisos financieros" },
-  salud:     { label:"Salud",          icon:"🏥", color:"#38bdf8", desc:"Médico, remedios, atenciones — lo que no se puede dejar" },
-  emergencias:{ label:"Emergencias",  icon:"🚨", color:"#fbbf24", desc:"Imprevistos que aparecen cuando menos los esperas" },
+  deudas:    { label:"Deudas",         icon:"📋", color:"#f87171", desc:"Cuotas, préstamos y compromisos financieros" },
+  salud:     { label:"Salud",          icon:"💊", color:"#38bdf8", desc:"Médico, remedios, atenciones — lo que no se puede dejar" },
+  emergencias:{ label:"Emergencias",   icon:"⚡", color:"#fbbf24", desc:"Imprevistos que aparecen cuando menos los esperas" },
 };
 
 const STORAGE_KEY = "sueldo_tracker_v8";
@@ -159,7 +159,8 @@ const DEFAULT = {
   pendientes:[],
   subcats:   Object.fromEntries(DEFAULT_CAT_KEYS.map(k => [k, []])),
   cats:      { ...DEFAULT_CATS },
-  catKeys:   DEFAULT_CAT_KEYS, // orden de categorías, incluye custom
+  catKeys:   DEFAULT_CAT_KEYS,
+  metas:     [], // array de metas de ahorro
 };
 
 function sanitizeState(d) {
@@ -174,6 +175,7 @@ function sanitizeState(d) {
     },
     historial:  Array.isArray(d.historial)  ? d.historial  : [],
     pendientes: Array.isArray(d.pendientes) ? d.pendientes : [],
+    metas:      Array.isArray(d.metas)      ? d.metas      : [],
     subcats, cats, catKeys,
   };
 }
@@ -909,6 +911,533 @@ function TabEmail({ emailText, setEmailText, emailLoading, emailError, setEmailE
   );
 }
 
+// ─── NUEVA META SHEET ─────────────────────────────────────────────────────────
+function NuevaMetaSheet({ onSave, onClose, metaEditar, th }) {
+  const [nombre,  setNombre]  = useState(metaEditar?.nombre  || "");
+  const [monto,   setMonto]   = useState(metaEditar?.monto   ? String(metaEditar.monto) : "");
+  const [ahorrado,setAhorrado]= useState(metaEditar?.ahorrado? String(metaEditar.ahorrado) : "");
+  const [fecha,   setFecha]   = useState(metaEditar?.fecha   || "");
+  const [icon,    setIcon]    = useState(metaEditar?.icon    || "🎯");
+  const [color,   setColor]   = useState(metaEditar?.color   || "#4ade80");
+  const [tabSel,  setTabSel]  = useState("emoji");
+
+  const EMOJIS_META = ["🎯","🎮","✈️","🏠","🚗","💻","📱","👗","🎸","🐾","🌊","🏋️","📚","💍","🛍️","🎪","🌴","⭐","🚀","💰","🏆","🎁","🌟","🍕","🎬","🎵","🏖️","🦋","🌈","🔑"];
+
+  const montoVal    = parse$(monto);
+  const ahorradoVal = parse$(ahorrado);
+  const ok = nombre.trim().length > 0 && montoVal > 0;
+
+  return (
+    <Sheet onClose={onClose}>
+      <h2 style={{ color:th.text,fontSize:18,marginBottom:4 }}>{metaEditar ? "✏️ Editar meta" : "🎯 Nueva meta"}</h2>
+      <p style={{ color:th.text3,fontSize:13,marginBottom:16 }}>Define tu objetivo de ahorro</p>
+
+      {/* Preview */}
+      <div style={{ background:color+"18",border:`2px solid ${color}44`,borderRadius:14,padding:"14px 16px",marginBottom:18,display:"flex",alignItems:"center",gap:12 }}>
+        <div style={{ width:48,height:48,borderRadius:12,background:color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,border:`2px solid ${color}55`,flexShrink:0 }}>{icon}</div>
+        <div style={{ flex:1,minWidth:0 }}>
+          <div style={{ color:th.text,fontWeight:800,fontSize:15 }}>{nombre||"Mi meta"}</div>
+          <div style={{ color:color,fontSize:13,fontWeight:700,fontFamily:"system-ui,sans-serif",marginTop:2 }}>
+            {ahorradoVal>0?fmt(ahorradoVal):"$0"} / {montoVal>0?fmt(montoVal):"$???"}
+          </div>
+          {montoVal>0&&(
+            <div style={{ marginTop:6 }}>
+              <div style={{ background:th.border,borderRadius:99,height:5,overflow:"hidden" }}>
+                <div style={{ height:"100%",borderRadius:99,width:`${Math.min(100,(ahorradoVal/montoVal)*100)}%`,background:color,transition:"width 0.5s" }}/>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <label style={{ display:"block",color:th.text2,fontSize:10,marginBottom:5,fontWeight:700,letterSpacing:"0.07em" }}>NOMBRE DE LA META</label>
+      <input autoFocus value={nombre} onChange={e=>setNombre(e.target.value)} placeholder="ej: PS5, Viaje a Brasil, etc."
+        style={{ width:"100%",boxSizing:"border-box",background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:11,padding:"11px 13px",color:th.text,fontSize:14,marginBottom:12,outline:"none" }}/>
+
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12 }}>
+        <div>
+          <label style={{ display:"block",color:th.text2,fontSize:10,marginBottom:5,fontWeight:700,letterSpacing:"0.07em" }}>MONTO OBJETIVO</label>
+          <div style={{ position:"relative" }}>
+            <span style={{ position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",color:th.text3,fontWeight:700,fontSize:13 }}>$</span>
+            <input type="number" value={monto} onChange={e=>setMonto(e.target.value)} placeholder="800000"
+              style={{ width:"100%",boxSizing:"border-box",background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:11,padding:"11px 11px 11px 24px",color:th.text,fontSize:13,outline:"none" }}/>
+          </div>
+        </div>
+        <div>
+          <label style={{ display:"block",color:th.text2,fontSize:10,marginBottom:5,fontWeight:700,letterSpacing:"0.07em" }}>YA AHORRADO</label>
+          <div style={{ position:"relative" }}>
+            <span style={{ position:"absolute",left:11,top:"50%",transform:"translateY(-50%)",color:th.text3,fontWeight:700,fontSize:13 }}>$</span>
+            <input type="number" value={ahorrado} onChange={e=>setAhorrado(e.target.value)} placeholder="0"
+              style={{ width:"100%",boxSizing:"border-box",background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:11,padding:"11px 11px 11px 24px",color:th.text,fontSize:13,outline:"none" }}/>
+          </div>
+        </div>
+      </div>
+
+      <label style={{ display:"block",color:th.text2,fontSize:10,marginBottom:5,fontWeight:700,letterSpacing:"0.07em" }}>FECHA OBJETIVO <span style={{ color:th.text3,fontWeight:400 }}>(opcional)</span></label>
+      <input type="date" value={fecha} onChange={e=>setFecha(e.target.value)}
+        style={{ width:"100%",boxSizing:"border-box",background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:11,padding:"11px 13px",color:th.text,fontSize:13,marginBottom:14,outline:"none" }}/>
+
+      {/* Emoji y color */}
+      <div style={{ display:"flex",gap:6,marginBottom:10 }}>
+        {["emoji","color"].map(t=>(
+          <button key={t} onClick={()=>setTabSel(t)} style={{ flex:1,padding:"7px",borderRadius:10,border:`1px solid ${tabSel===t?color:th.border2}`,background:tabSel===t?color+"18":"transparent",color:tabSel===t?color:th.text3,cursor:"pointer",fontSize:12,fontWeight:700 }}>
+            {t==="emoji"?"🎭 Emoji":"🎨 Color"}
+          </button>
+        ))}
+      </div>
+      {tabSel==="emoji"&&(
+        <div style={{ display:"flex",flexWrap:"wrap",gap:5,maxHeight:130,overflowY:"auto",marginBottom:14 }}>
+          {EMOJIS_META.map(e=>(
+            <button key={e} onClick={()=>setIcon(e)} style={{ width:38,height:38,borderRadius:9,border:`2px solid ${icon===e?color:th.border2}`,background:icon===e?color+"22":"transparent",fontSize:20,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>{e}</button>
+          ))}
+        </div>
+      )}
+      {tabSel==="color"&&(
+        <div style={{ display:"flex",flexWrap:"wrap",gap:7,marginBottom:14 }}>
+          {COLOR_PALETTE.slice(0,20).map(col=>(
+            <button key={col} onClick={()=>setColor(col)} style={{ width:28,height:28,borderRadius:"50%",background:col,border:`3px solid ${color===col?"#f4f4f5":"transparent"}`,cursor:"pointer",outline:"none",transition:"transform 0.1s",transform:color===col?"scale(1.2)":"scale(1)" }}/>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display:"flex",gap:10,marginTop:4 }}>
+        <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:`1px solid ${th.border2}`,background:"transparent",color:th.text2,cursor:"pointer" }}>Cancelar</button>
+        <button onClick={()=>ok&&onSave({ id:metaEditar?.id||uid(), nombre:nombre.trim(), monto:montoVal, ahorrado:ahorradoVal, fecha, icon, color, creadaEn:metaEditar?.creadaEn||new Date().toLocaleDateString("es-CL") })} disabled={!ok}
+          style={{ flex:2,padding:12,borderRadius:12,border:"none",background:ok?`linear-gradient(135deg,${color},${color}bb)`:"#27272a",color:ok?"#09090b":th.text3,fontWeight:800,cursor:ok?"pointer":"not-allowed",fontSize:14,transition:"all 0.2s" }}>
+          {metaEditar?"Guardar cambios":"Crear meta"}
+        </button>
+      </div>
+    </Sheet>
+  );
+}
+
+// ─── TAB METAS ────────────────────────────────────────────────────────────────
+function TabMetas({ metas, onNueva, onEdit, onDelete, onAbonar, th }) {
+
+  const metasActivas    = metas.filter(m => m.ahorrado < m.monto);
+  const metasCumplidas  = metas.filter(m => m.ahorrado >= m.monto);
+
+  const diasRestantes = (fechaStr) => {
+    if (!fechaStr) return null;
+    const hoy   = new Date();
+    const fecha = new Date(fechaStr);
+    const diff  = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
+  if (metas.length === 0) return (
+    <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+        <div>
+          <h2 style={{ fontSize:16,fontWeight:800,color:th.text,marginBottom:2 }}>🎯 Metas</h2>
+          <p style={{ color:th.text3,fontSize:12 }}>Tus objetivos de ahorro</p>
+        </div>
+        <button onClick={onNueva} style={{ padding:"8px 14px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#818cf8,#6366f1)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13 }}>+ Nueva</button>
+      </div>
+      <div style={{ textAlign:"center",padding:"50px 20px",background:th.surface,borderRadius:14,border:`1px solid ${th.border}` }}>
+        <div style={{ fontSize:44,marginBottom:12 }}>🎯</div>
+        <div style={{ color:th.text2,fontSize:15,marginBottom:6 }}>Sin metas todavía</div>
+        <div style={{ color:th.text3,fontSize:13,marginBottom:20 }}>Crea tu primera meta y empieza a ahorrar con propósito</div>
+        <button onClick={onNueva} style={{ padding:"11px 24px",borderRadius:12,border:"none",background:"linear-gradient(135deg,#818cf8,#6366f1)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:14 }}>🎯 Crear primera meta</button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+        <div>
+          <h2 style={{ fontSize:16,fontWeight:800,color:th.text,marginBottom:2 }}>🎯 Metas</h2>
+          <p style={{ color:th.text3,fontSize:12 }}>{metasActivas.length} activas · {metasCumplidas.length} cumplidas</p>
+        </div>
+        <button onClick={onNueva} style={{ padding:"8px 14px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#818cf8,#6366f1)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13 }}>+ Nueva</button>
+      </div>
+
+      {/* METAS ACTIVAS */}
+      {metasActivas.length > 0 && (
+        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+          {metasActivas.map(meta => {
+            const pct      = Math.min(100, (meta.ahorrado / meta.monto) * 100);
+            const falta    = meta.monto - meta.ahorrado;
+            const dias     = diasRestantes(meta.fecha);
+            return (
+              <div key={meta.id} style={{ background:th.surface,border:`1px solid ${meta.color}33`,borderRadius:16,padding:"16px",position:"relative",overflow:"hidden" }}>
+                {/* Fondo sutil del color */}
+                <div style={{ position:"absolute",top:0,right:0,width:80,height:80,background:meta.color+"08",borderRadius:"0 16px 0 80px" }}/>
+
+                <div style={{ display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:12 }}>
+                  <div style={{ display:"flex",alignItems:"center",gap:10 }}>
+                    <div style={{ width:42,height:42,borderRadius:11,background:meta.color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,border:`2px solid ${meta.color}44`,flexShrink:0 }}>{meta.icon}</div>
+                    <div>
+                      <div style={{ color:th.text,fontWeight:800,fontSize:14 }}>{meta.nombre}</div>
+                      <div style={{ color:th.text3,fontSize:11,marginTop:1 }}>Creada {meta.creadaEn}</div>
+                    </div>
+                  </div>
+                  <div style={{ display:"flex",gap:5 }}>
+                    <button onClick={()=>onEdit(meta)} style={{ background:th.border,border:"none",color:th.text2,cursor:"pointer",fontSize:12,padding:"5px 8px",borderRadius:8 }}>✏️</button>
+                    <button onClick={()=>onDelete(meta.id)} style={{ background:th.border,border:"none",color:"#f87171",cursor:"pointer",fontSize:12,padding:"5px 8px",borderRadius:8 }}>✕</button>
+                  </div>
+                </div>
+
+                {/* Montos */}
+                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8 }}>
+                  <div>
+                    <span style={{ color:meta.color,fontWeight:800,fontSize:18,fontFamily:"system-ui,sans-serif" }}>{fmt(meta.ahorrado)}</span>
+                    <span style={{ color:th.text3,fontSize:13,fontFamily:"system-ui,sans-serif" }}> / {fmt(meta.monto)}</span>
+                  </div>
+                  <span style={{ color:meta.color,fontWeight:700,fontSize:14 }}>{pct.toFixed(0)}%</span>
+                </div>
+
+                {/* Barra animada */}
+                <div style={{ background:th.border,borderRadius:99,height:10,overflow:"hidden",marginBottom:10 }}>
+                  <div style={{ height:"100%",borderRadius:99,width:`${pct}%`,background:`linear-gradient(90deg,${meta.color}99,${meta.color})`,transition:"width 0.8s ease",position:"relative" }}>
+                    {pct > 15 && <div style={{ position:"absolute",right:6,top:"50%",transform:"translateY(-50%)",width:6,height:6,borderRadius:"50%",background:"rgba(255,255,255,0.6)" }}/>}
+                  </div>
+                </div>
+
+                {/* Info adicional */}
+                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                  <span style={{ color:th.text3,fontSize:11 }}>Faltan <strong style={{ color:th.text2,fontFamily:"system-ui,sans-serif" }}>{fmt(falta)}</strong></span>
+                  <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+                    {dias !== null && (
+                      <span style={{ color:dias<30?"#f87171":dias<90?"#fb923c":th.text3,fontSize:11 }}>
+                        {dias > 0 ? `${dias} días` : dias === 0 ? "¡Hoy!" : "Vencida"}
+                      </span>
+                    )}
+                    {/* Botón abonar */}
+                    <button onClick={()=>onAbonar(meta)} style={{ padding:"5px 12px",borderRadius:9,border:"none",background:meta.color,color:"#09090b",fontWeight:700,cursor:"pointer",fontSize:11 }}>
+                      + Abonar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* METAS CUMPLIDAS */}
+      {metasCumplidas.length > 0 && (
+        <>
+          <div style={{ color:th.text3,fontSize:10,fontWeight:700,letterSpacing:"0.06em",marginTop:6 }}>✅ CUMPLIDAS</div>
+          <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+            {metasCumplidas.map(meta => (
+              <div key={meta.id} style={{ background:th.surface,border:"1px solid #34d39933",borderRadius:13,padding:"13px 14px",display:"flex",alignItems:"center",gap:12,opacity:0.8 }}>
+                <div style={{ width:38,height:38,borderRadius:10,background:"#34d39922",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,border:"2px solid #34d39944",flexShrink:0 }}>{meta.icon}</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ color:th.text,fontWeight:700,fontSize:13 }}>{meta.nombre}</div>
+                  <div style={{ color:"#34d399",fontSize:12,fontFamily:"system-ui,sans-serif" }}>✅ {fmt(meta.monto)} — ¡Cumplida!</div>
+                </div>
+                <button onClick={()=>onDelete(meta.id)} style={{ background:th.border,border:"none",color:th.text3,cursor:"pointer",fontSize:11,padding:"4px 7px",borderRadius:7 }}>✕</button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── ABONAR A META SHEET ──────────────────────────────────────────────────────
+function AbonarSheet({ meta, onSave, onClose, th }) {
+  const [monto, setMonto] = useState("");
+  const val = parse$(monto);
+  const ok  = val > 0;
+  const nuevoTotal = meta.ahorrado + val;
+  const pct = Math.min(100, (nuevoTotal / meta.monto) * 100);
+
+  return (
+    <Sheet onClose={onClose}>
+      <h2 style={{ color:th.text,fontSize:18,marginBottom:4 }}>💰 Abonar a meta</h2>
+      <div style={{ background:meta.color+"18",border:`1px solid ${meta.color}44`,borderRadius:12,padding:"12px 14px",marginBottom:18,display:"flex",alignItems:"center",gap:10 }}>
+        <span style={{ fontSize:22 }}>{meta.icon}</span>
+        <div>
+          <div style={{ color:th.text,fontWeight:700,fontSize:14 }}>{meta.nombre}</div>
+          <div style={{ color:meta.color,fontSize:12,fontFamily:"system-ui,sans-serif" }}>{fmt(meta.ahorrado)} / {fmt(meta.monto)}</div>
+        </div>
+      </div>
+
+      <label style={{ display:"block",color:th.text2,fontSize:10,marginBottom:5,fontWeight:700,letterSpacing:"0.07em" }}>CUÁNTO QUIERES ABONAR</label>
+      <div style={{ position:"relative",marginBottom:14 }}>
+        <span style={{ position:"absolute",left:13,top:"50%",transform:"translateY(-50%)",color:th.text3,fontWeight:700 }}>$</span>
+        <input autoFocus type="number" value={monto} onChange={e=>setMonto(e.target.value)} placeholder="50000"
+          style={{ width:"100%",boxSizing:"border-box",background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:12,padding:"13px 13px 13px 28px",color:th.text,fontSize:18,outline:"none" }}/>
+      </div>
+
+      {val > 0 && (
+        <div style={{ background:th.surface2,borderRadius:11,padding:"11px 13px",marginBottom:14 }}>
+          <div style={{ display:"flex",justifyContent:"space-between",marginBottom:7 }}>
+            <span style={{ color:th.text3,fontSize:12 }}>Nuevo total</span>
+            <span style={{ color:meta.color,fontWeight:800,fontSize:13,fontFamily:"system-ui,sans-serif" }}>{fmt(Math.min(nuevoTotal,meta.monto))} / {fmt(meta.monto)}</span>
+          </div>
+          <div style={{ background:th.border,borderRadius:99,height:8,overflow:"hidden" }}>
+            <div style={{ height:"100%",borderRadius:99,width:`${pct}%`,background:`linear-gradient(90deg,${meta.color}99,${meta.color})`,transition:"width 0.5s" }}/>
+          </div>
+          {nuevoTotal >= meta.monto && (
+            <div style={{ color:"#34d399",fontWeight:700,fontSize:13,marginTop:8,textAlign:"center" }}>🎉 ¡Vas a cumplir esta meta!</div>
+          )}
+        </div>
+      )}
+
+      <div style={{ display:"flex",gap:10 }}>
+        <button onClick={onClose} style={{ flex:1,padding:12,borderRadius:12,border:`1px solid ${th.border2}`,background:"transparent",color:th.text2,cursor:"pointer" }}>Cancelar</button>
+        <button onClick={()=>ok&&onSave(meta.id,val)} disabled={!ok} style={{ flex:2,padding:12,borderRadius:12,border:"none",background:ok?`linear-gradient(135deg,${meta.color},${meta.color}bb)`:"#27272a",color:ok?"#09090b":th.text3,fontWeight:800,cursor:ok?"pointer":"not-allowed",fontSize:14 }}>
+          Abonar {val>0?fmt(val):""}
+        </button>
+      </div>
+    </Sheet>
+  );
+}
+
+// ─── TAB ESTADÍSTICAS ─────────────────────────────────────────────────────────
+function TabEstadisticas({ activo, historial, cats, catKeys, th }) {
+
+  // Todos los meses juntos (activo + historial) para comparar
+  const todosMeses = useMemo(() => {
+    const meses = [...historial];
+    if (activo.gastos.length > 0 || activo.sueldo > 0) {
+      meses.unshift({ ...activo, _uid: "activo" });
+    }
+    return meses.slice(0, 6).reverse(); // últimos 6 meses, de antiguo a nuevo
+  }, [activo, historial]);
+
+  // Estadísticas globales
+  const stats = useMemo(() => {
+    const cerrados = historial;
+    if (cerrados.length === 0 && activo.gastos.length === 0) return null;
+
+    const totalHistGastado = cerrados.reduce((a, m) => a + m.gastos.reduce((x, g) => x + g.monto, 0), 0);
+    const totalHistAhorro  = cerrados.reduce((a, m) => { const g = m.gastos.reduce((x,y)=>x+y.monto,0); return a+(m.sueldo-g); }, 0);
+    const promedioMensual  = cerrados.length > 0 ? Math.round(totalHistGastado / cerrados.length) : 0;
+    const mejorMes         = cerrados.reduce((best, m) => { const g=m.gastos.reduce((x,y)=>x+y.monto,0); const ah=m.sueldo-g; return ah > (best?.ahorro||-Infinity) ? {...m,ahorro:ah} : best; }, null);
+    const peorMes          = cerrados.reduce((worst, m) => { const g=m.gastos.reduce((x,y)=>x+y.monto,0); const ah=m.sueldo-g; return ah < (worst?.ahorro||Infinity) ? {...m,ahorro:ah} : worst; }, null);
+
+    // Categoría más costosa (histórico)
+    const catTotales = {};
+    [...cerrados, activo].forEach(m => m.gastos.forEach(g => { catTotales[g.categoria] = (catTotales[g.categoria]||0) + g.monto; }));
+    const catMasCostosa = Object.entries(catTotales).sort((a,b)=>b[1]-a[1])[0];
+
+    // Promedio diario del mes actual
+    const diasTranscurridos = new Date().getDate();
+    const promedioDiario = activo.gastos.length > 0 ? Math.round(activo.gastos.reduce((a,g)=>a+g.monto,0) / diasTranscurridos) : 0;
+
+    // Gastos hormiga del mes actual
+    const gastosHormiga = activo.gastos.filter(g=>g.categoria==="hormiga").reduce((a,g)=>a+g.monto,0);
+
+    return { totalHistGastado, totalHistAhorro, promedioMensual, mejorMes, peorMes, catMasCostosa, promedioDiario, gastosHormiga, mesesCerrados: cerrados.length };
+  }, [activo, historial]);
+
+  // Gráfico de barras SVG — gastos por mes
+  const maxGasto = Math.max(...todosMeses.map(m => m.gastos.reduce((a,g)=>a+g.monto,0)), 1);
+  const BAR_H = 120;
+  const BAR_W = todosMeses.length > 0 ? Math.floor(260 / todosMeses.length) - 6 : 30;
+
+  // Gráfico torta SVG — categorías del mes actual
+  const tortaData = useMemo(() => {
+    const total = activo.gastos.reduce((a,g)=>a+g.monto,0);
+    if (total === 0) return [];
+    let angulo = 0;
+    return catKeys.map(k => {
+      const v = activo.gastos.filter(g=>g.categoria===k).reduce((a,g)=>a+g.monto,0);
+      if (v === 0) return null;
+      const pct  = v / total;
+      const start = angulo;
+      angulo += pct * 360;
+      return { k, v, pct, start, end: angulo };
+    }).filter(Boolean);
+  }, [activo.gastos, catKeys]);
+
+  // Helper SVG arc
+  const polarToXY = (cx, cy, r, angle) => {
+    const rad = (angle - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  };
+  const arcPath = (cx, cy, r, startAngle, endAngle) => {
+    const s = polarToXY(cx, cy, r, startAngle);
+    const e = polarToXY(cx, cy, r, endAngle);
+    const large = endAngle - startAngle > 180 ? 1 : 0;
+    return `M ${cx} ${cy} L ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y} Z`;
+  };
+
+  if (!stats && todosMeses.length === 0) return (
+    <div style={{ textAlign:"center",padding:"50px 20px" }}>
+      <div style={{ fontSize:42,marginBottom:12 }}>📈</div>
+      <div style={{ color:th.text2,fontSize:15,marginBottom:6 }}>Sin datos todavía</div>
+      <div style={{ color:th.text3,fontSize:13 }}>Registra gastos y cierra meses para ver estadísticas</div>
+    </div>
+  );
+
+  return (
+    <div style={{ display:"flex",flexDirection:"column",gap:14 }}>
+
+      {/* MÉTRICAS RÁPIDAS */}
+      {stats && (
+        <>
+          <div style={{ color:th.text3,fontSize:10,fontWeight:700,letterSpacing:"0.06em" }}>RESUMEN GENERAL</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+            {[
+              { label:"Total gastado histórico", value:fmt(stats.totalHistGastado), color:"#fb923c", icon:"📤" },
+              { label:"Total ahorrado histórico", value:fmt(stats.totalHistAhorro),  color:"#34d399", icon:"💰" },
+              { label:"Promedio mensual",          value:fmt(stats.promedioMensual),  color:th.accent, icon:"📊" },
+              { label:"Promedio diario (mes actual)", value:fmt(stats.promedioDiario), color:"#60a5fa", icon:"📅" },
+              { label:"Gastos hormiga este mes",  value:fmt(stats.gastosHormiga),    color:"#fb923c", icon:"🐜" },
+              { label:"Meses registrados",         value:String(stats.mesesCerrados), color:th.accent, icon:"🗂️" },
+            ].map(c => (
+              <div key={c.label} style={{ background:th.surface,border:`1px solid ${th.border}`,borderRadius:12,padding:"12px 11px" }}>
+                <div style={{ fontSize:18,marginBottom:4 }}>{c.icon}</div>
+                <div style={{ color:th.text3,fontSize:9,fontWeight:700,letterSpacing:"0.05em",marginBottom:3 }}>{c.label.toUpperCase()}</div>
+                <div style={{ color:c.color,fontSize:14,fontWeight:800,fontFamily:"system-ui,sans-serif" }}>{c.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mejor y peor mes */}
+          {(stats.mejorMes || stats.peorMes) && (
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+              {stats.mejorMes && (
+                <div style={{ background:th.surface,border:"1px solid #34d39944",borderRadius:12,padding:"12px" }}>
+                  <div style={{ color:"#34d399",fontSize:10,fontWeight:700,marginBottom:4 }}>🏆 MEJOR MES</div>
+                  <div style={{ color:th.text,fontWeight:700,fontSize:13 }}>{monthLabel(stats.mejorMes.mes)}</div>
+                  <div style={{ color:"#34d399",fontWeight:800,fontSize:14,fontFamily:"system-ui,sans-serif" }}>{fmt(stats.mejorMes.ahorro)}</div>
+                  <div style={{ color:th.text3,fontSize:10 }}>ahorrado</div>
+                </div>
+              )}
+              {stats.peorMes && (
+                <div style={{ background:th.surface,border:"1px solid #f8717144",borderRadius:12,padding:"12px" }}>
+                  <div style={{ color:"#f87171",fontSize:10,fontWeight:700,marginBottom:4 }}>📉 PEOR MES</div>
+                  <div style={{ color:th.text,fontWeight:700,fontSize:13 }}>{monthLabel(stats.peorMes.mes)}</div>
+                  <div style={{ color:"#f87171",fontWeight:800,fontSize:14,fontFamily:"system-ui,sans-serif" }}>{fmt(Math.abs(stats.peorMes.ahorro))}</div>
+                  <div style={{ color:th.text3,fontSize:10 }}>{stats.peorMes.ahorro >= 0 ? "ahorrado" : "excedido"}</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Categoría más costosa */}
+          {stats.catMasCostosa && cats[stats.catMasCostosa[0]] && (
+            <div style={{ background:th.surface,border:`1px solid ${th.border}`,borderRadius:12,padding:"13px 14px",display:"flex",alignItems:"center",gap:12 }}>
+              <div style={{ fontSize:26 }}>{cats[stats.catMasCostosa[0]]?.icon || "📦"}</div>
+              <div>
+                <div style={{ color:th.text3,fontSize:10,fontWeight:700,marginBottom:2 }}>CATEGORÍA MÁS COSTOSA (HISTÓRICO)</div>
+                <div style={{ color:th.text,fontWeight:700,fontSize:14 }}>{cats[stats.catMasCostosa[0]]?.label}</div>
+                <div style={{ color:"#fb923c",fontWeight:800,fontSize:13,fontFamily:"system-ui,sans-serif" }}>{fmt(stats.catMasCostosa[1])} total gastado</div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* GRÁFICO DE BARRAS — gastos por mes */}
+      {todosMeses.length > 1 && (
+        <div style={{ background:th.surface,border:`1px solid ${th.border}`,borderRadius:13,padding:"15px" }}>
+          <div style={{ color:th.text3,fontSize:11,fontWeight:700,letterSpacing:"0.06em",marginBottom:14 }}>GASTOS POR MES</div>
+          <div style={{ display:"flex",alignItems:"flex-end",justifyContent:"space-around",height:BAR_H+40,gap:4 }}>
+            {todosMeses.map((m, i) => {
+              const gasto   = m.gastos.reduce((a,g)=>a+g.monto,0);
+              const ahorro  = m.sueldo - gasto;
+              const barH    = Math.max(4, Math.round((gasto / maxGasto) * BAR_H));
+              const isActivo= m._uid === "activo";
+              return (
+                <div key={m._uid||m.mes} style={{ display:"flex",flexDirection:"column",alignItems:"center",gap:4,flex:1 }}>
+                  <div style={{ color:ahorro>=0?"#34d399":"#f87171",fontSize:8,fontWeight:700,fontFamily:"system-ui,sans-serif",whiteSpace:"nowrap" }}>
+                    {ahorro>=0?"+":""}{Math.round(ahorro/1000)}k
+                  </div>
+                  <div style={{
+                    width:"100%", height:barH, borderRadius:"4px 4px 0 0",
+                    background: isActivo ? th.accent : (ahorro>=0?"#34d399":"#f87171"),
+                    opacity: isActivo ? 1 : 0.7,
+                    transition:"height 0.5s ease",
+                    minHeight:4,
+                  }}/>
+                  <div style={{ color:th.text3,fontSize:8,textAlign:"center",whiteSpace:"nowrap",overflow:"hidden",maxWidth:36 }}>
+                    {monthLabel(m.mes).slice(0,3)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display:"flex",gap:14,marginTop:10,justifyContent:"center" }}>
+            <div style={{ display:"flex",alignItems:"center",gap:5 }}>
+              <div style={{ width:10,height:10,borderRadius:2,background:"#34d399" }}/>
+              <span style={{ color:th.text3,fontSize:10 }}>Con ahorro</span>
+            </div>
+            <div style={{ display:"flex",alignItems:"center",gap:5 }}>
+              <div style={{ width:10,height:10,borderRadius:2,background:"#f87171" }}/>
+              <span style={{ color:th.text3,fontSize:10 }}>Excedido</span>
+            </div>
+            <div style={{ display:"flex",alignItems:"center",gap:5 }}>
+              <div style={{ width:10,height:10,borderRadius:2,background:th.accent }}/>
+              <span style={{ color:th.text3,fontSize:10 }}>Mes actual</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GRÁFICO TORTA — mes actual */}
+      {tortaData.length > 0 && (
+        <div style={{ background:th.surface,border:`1px solid ${th.border}`,borderRadius:13,padding:"15px" }}>
+          <div style={{ color:th.text3,fontSize:11,fontWeight:700,letterSpacing:"0.06em",marginBottom:14 }}>DISTRIBUCIÓN MES ACTUAL</div>
+          <div style={{ display:"flex",alignItems:"center",gap:16 }}>
+            <svg width={110} height={110} style={{ flexShrink:0 }}>
+              {tortaData.map(({ k,pct,start,end }) => {
+                const c = cats[k]||DEFAULT_CATS[k]; if(!c)return null;
+                return <path key={k} d={arcPath(55,55,50,start,end)} fill={c.color} stroke={th.surface} strokeWidth={2}/>;
+              })}
+              <circle cx={55} cy={55} r={28} fill={th.surface}/>
+              <text x={55} y={52} textAnchor="middle" fill={th.text} fontSize={9} fontWeight={700}>MES</text>
+              <text x={55} y={64} textAnchor="middle" fill={th.text2} fontSize={8}>ACTUAL</text>
+            </svg>
+            <div style={{ flex:1,display:"flex",flexDirection:"column",gap:6 }}>
+              {tortaData.map(({ k,v,pct }) => {
+                const c=cats[k]||DEFAULT_CATS[k]; if(!c)return null;
+                return(
+                  <div key={k} style={{ display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+                    <div style={{ display:"flex",alignItems:"center",gap:6 }}>
+                      <div style={{ width:8,height:8,borderRadius:"50%",background:c.color,flexShrink:0 }}/>
+                      <span style={{ color:th.text2,fontSize:11 }}>{c.icon} {c.label}</span>
+                    </div>
+                    <div style={{ textAlign:"right" }}>
+                      <span style={{ color:c.color,fontSize:11,fontWeight:700,fontFamily:"system-ui,sans-serif" }}>{fmt(v)}</span>
+                      <span style={{ color:th.text3,fontSize:9,marginLeft:4 }}>{(pct*100).toFixed(0)}%</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EVOLUCIÓN DEL AHORRO */}
+      {historial.length > 1 && (
+        <div style={{ background:th.surface,border:`1px solid ${th.border}`,borderRadius:13,padding:"15px" }}>
+          <div style={{ color:th.text3,fontSize:11,fontWeight:700,letterSpacing:"0.06em",marginBottom:12 }}>EVOLUCIÓN DEL AHORRO</div>
+          <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+            {[...historial].slice(0,5).reverse().map(m => {
+              const gasto  = m.gastos.reduce((a,g)=>a+g.monto,0);
+              const ahorro = m.sueldo - gasto;
+              const pctBar = m.sueldo > 0 ? Math.min(100,Math.max(0,(ahorro/m.sueldo)*100)) : 0;
+              return(
+                <div key={m._uid||m.mes}>
+                  <div style={{ display:"flex",justifyContent:"space-between",marginBottom:4 }}>
+                    <span style={{ color:th.text2,fontSize:11 }}>{monthLabel(m.mes)}</span>
+                    <span style={{ color:ahorro>=0?"#34d399":"#f87171",fontWeight:700,fontSize:11,fontFamily:"system-ui,sans-serif" }}>
+                      {ahorro>=0?"+":""}{fmt(ahorro)}
+                    </span>
+                  </div>
+                  <div style={{ background:th.border,borderRadius:99,height:6,overflow:"hidden" }}>
+                    <div style={{ height:"100%",borderRadius:99,width:`${pctBar}%`,background:ahorro>=0?"linear-gradient(90deg,#10b981,#34d399)":"linear-gradient(90deg,#ef4444,#f87171)",transition:"width 0.5s" }}/>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── TAB TEMAS ────────────────────────────────────────────────────────────────
 function TabTemas({ temaActual, onChangeTema, th }) {
   return (
@@ -980,6 +1509,9 @@ export default function App() {
   const [clasificar,  setClasificar]  = useState(null);
   const [editCat,     setEditCat]     = useState(null);
   const [gastoEditar, setGastoEditar] = useState(null);
+  const [showNewMeta, setShowNewMeta] = useState(false);
+  const [metaEditar,  setMetaEditar]  = useState(null);
+  const [abonarMeta,  setAbonarMeta]  = useState(null);
 
   const [emailText,    setEmailText]    = useState("");
   const [emailLoading, setEmailLoading] = useState(false);
@@ -1029,7 +1561,19 @@ export default function App() {
     setEditCat(null);
   },[]);
 
-  const handleGastoSave = useCallback(g=>{
+  const handleSaveMeta = useCallback(meta=>{
+    setSt(p=>{ const idx=p.metas.findIndex(m=>m.id===meta.id); const metas=[...p.metas]; if(idx>-1)metas[idx]=meta; else metas.push(meta); return {...p,metas}; });
+    setShowNewMeta(false); setMetaEditar(null);
+  },[]);
+
+  const handleDeleteMeta = useCallback(id=>{
+    setSt(p=>({...p,metas:p.metas.filter(m=>m.id!==id)}));
+  },[]);
+
+  const handleAbonar = useCallback((metaId, monto)=>{
+    setSt(p=>({ ...p, metas:p.metas.map(m=>m.id===metaId?{...m,ahorrado:Math.min(m.ahorrado+monto,m.monto)}:m) }));
+    setAbonarMeta(null);
+  },[]);
     setSt(p=>{ const gastos=[...p.activo.gastos]; const idx=gastos.findIndex(x=>x.id===g.id); if(idx>-1)gastos[idx]=g; else gastos.unshift(g); return {...p,activo:{...p.activo,gastos}}; });
     setGastoEditar(null);
   },[]);
@@ -1045,7 +1589,7 @@ export default function App() {
 
   const cerrarMes = useCallback(()=>{
     setSt(p=>{ if(p.historial.length>0&&p.historial[0].mes===p.activo.mes)return p;
-      return { historial:[{...p.activo,_uid:uid()},...p.historial], activo:{mes:currentMonth(),sueldo:0,gastos:[]}, pendientes:p.pendientes, subcats:p.subcats, cats:p.cats, catKeys:p.catKeys };
+      return { historial:[{...p.activo,_uid:uid()},...p.historial], activo:{mes:currentMonth(),sueldo:0,gastos:[]}, pendientes:p.pendientes, subcats:p.subcats, cats:p.cats, catKeys:p.catKeys, metas:p.metas||[] };
     });
     setShowCerrar(false); setShowSueldo(true);
   },[]);
@@ -1093,7 +1637,7 @@ export default function App() {
     }finally{setEmailLoading(false);}
   };
 
-  const { activo, historial, pendientes, subcats, cats, catKeys } = st;
+  const { activo, historial, pendientes, subcats, cats, catKeys, metas } = st;
   const total    = useMemo(()=>activo.gastos.reduce((a,g)=>a+g.monto,0),[activo.gastos]);
   const restante = activo.sueldo - total;
   const pct      = activo.sueldo>0?Math.min(100,(total/activo.sueldo)*100):0;
@@ -1113,6 +1657,9 @@ export default function App() {
         textarea,button,input{font-family:system-ui,-apple-system,sans-serif;}
       `}</style>
 
+      {showNewMeta&&<NuevaMetaSheet onSave={handleSaveMeta} onClose={()=>setShowNewMeta(false)} th={th}/>}
+      {metaEditar&&<NuevaMetaSheet metaEditar={metaEditar} onSave={handleSaveMeta} onClose={()=>setMetaEditar(null)} th={th}/>}
+      {abonarMeta&&<AbonarSheet meta={abonarMeta} onSave={handleAbonar} onClose={()=>setAbonarMeta(null)} th={th}/>}
       {showSueldo&&<SueldoSheet current={activo.sueldo} onSave={saveSueldo} onClose={()=>setShowSueldo(false)}/>}
       {gastoEditar!==null&&<GastoSheet gastoEditar={Object.keys(gastoEditar).length>0?gastoEditar:null} onSave={handleGastoSave} onAddSub={handleAddSub} onDeleteSub={handleDeleteSub} onClose={()=>setGastoEditar(null)} subcats={subcats} cats={cats} catKeys={catKeys}/>}
       {showCerrar&&<CerrarSheet activo={activo} onConfirm={cerrarMes} onClose={()=>setShowCerrar(false)}/>}
@@ -1147,7 +1694,7 @@ export default function App() {
       </header>
 
       <div style={{ display:"flex",borderBottom:`1px solid ${th.border}`,padding:"0 16px",overflowX:"auto" }}>
-        {[["dashboard","📊 Resumen"],["gastos","📋 Gastos"],["categorias","🎨 Categorías"],["historial","🗂️ Historial"],["temas","🌈 Temas"],["email","📧 Correo"]].map(([k,lbl])=>(
+        {[["dashboard","📊 Resumen"],["gastos","📋 Gastos"],["metas","🎯 Metas"],["stats","📈 Stats"],["categorias","🎨 Cats"],["historial","🗂️ Historial"],["temas","🌈 Temas"],["email","📧 Correo"]].map(([k,lbl])=>(
           <button key={k} onClick={()=>setTab(k)} style={{ padding:"10px 11px",background:"transparent",border:"none",color:tab===k?th.accent:th.text3,cursor:"pointer",fontSize:12,borderBottom:`2px solid ${tab===k?th.accent:"transparent"}`,transition:"all 0.15s",whiteSpace:"nowrap" }}>{lbl}</button>
         ))}
       </div>
@@ -1157,6 +1704,8 @@ export default function App() {
         {tab==="gastos"&&<TabGastos gastosOrdenados={gastosOrdenados} total={total} cats={cats} catKeys={catKeys} onDelete={setDeleteId} onEdit={g=>setGastoEditar(g)}/>}
         {tab==="categorias"&&<TabCategorias cats={cats} catKeys={catKeys} defaultCatKeys={DEFAULT_CAT_KEYS} onEdit={setEditCat} onNew={()=>setShowNewCat(true)}/>}
         {tab==="historial"&&<TabHistorial historial={historial} totalAhorro={totalAhorro} cats={cats} catKeys={catKeys}/>}
+        {tab==="metas"&&<TabMetas metas={metas} onNueva={()=>setShowNewMeta(true)} onEdit={m=>{setMetaEditar(m);}} onDelete={handleDeleteMeta} onAbonar={m=>setAbonarMeta(m)} th={th}/>}
+        {tab==="stats"&&<TabEstadisticas activo={activo} historial={historial} cats={cats} catKeys={catKeys} th={th}/>}
         {tab==="temas"&&<TabTemas temaActual={tema} onChangeTema={handleChangeTema} th={th}/>}
         {tab==="email"&&<TabEmail emailText={emailText} setEmailText={setEmailText} emailLoading={emailLoading} emailError={emailError} setEmailError={setEmailError} onParse={parseEmail} pendientes={pendientes}/>}
       </main>
