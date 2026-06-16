@@ -207,6 +207,7 @@ function Sheet({ children, onClose }) {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function Badge({ cat, cats }) {
   const c = (cats || DEFAULT_CATS)[cat];
   if (!c) return null;
@@ -1230,7 +1231,6 @@ function TabEstadisticas({ activo, historial, cats, catKeys, th }) {
   // Gráfico de barras SVG — gastos por mes
   const maxGasto = Math.max(...todosMeses.map(m => m.gastos.reduce((a,g)=>a+g.monto,0)), 1);
   const BAR_H = 120;
-  const BAR_W = todosMeses.length > 0 ? Math.floor(260 / todosMeses.length) - 6 : 30;
 
   // Gráfico torta SVG — categorías del mes actual
   const tortaData = useMemo(() => {
