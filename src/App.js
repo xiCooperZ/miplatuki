@@ -1574,6 +1574,8 @@ export default function App() {
     setSt(p=>({ ...p, metas:p.metas.map(m=>m.id===metaId?{...m,ahorrado:Math.min(m.ahorrado+monto,m.monto)}:m) }));
     setAbonarMeta(null);
   },[]);
+
+  const handleGastoSave = useCallback(g=>{
     setSt(p=>{ const gastos=[...p.activo.gastos]; const idx=gastos.findIndex(x=>x.id===g.id); if(idx>-1)gastos[idx]=g; else gastos.unshift(g); return {...p,activo:{...p.activo,gastos}}; });
     setGastoEditar(null);
   },[]);
