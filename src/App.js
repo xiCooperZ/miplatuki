@@ -1519,7 +1519,17 @@ export default function App() {
 
   useEffect(()=>{
     loadDB().then(d=>{
-      if(d) setSt(sanitizeState(d)); else setShowSueldo(true);
+      if(d) {
+        const state = sanitizeState(d);
+        // Migración: forzar emojis correctos en categorías base
+        const fixedIcons = { deudas:"📋", salud:"💊", emergencias:"⚡" };
+        Object.entries(fixedIcons).forEach(([key, icon]) => {
+          if (state.cats[key]) state.cats[key] = { ...state.cats[key], icon };
+        });
+        setSt(state);
+      } else {
+        setShowSueldo(true);
+      }
       setLoaded(true);
     });
   },[]);
